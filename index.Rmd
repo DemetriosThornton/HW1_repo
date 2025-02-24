@@ -1,0 +1,55 @@
+---
+title: "Best Performing Countries in Obesity, Alchohol and Tobacco Use"
+Name: Demetrios Thornton
+output:
+  html_document:
+    df_print: paged
+---
+Homework #1 (option A) Exploring Spatial Data
+
+```{r}
+rm(list = ls())
+library(ggplot2)
+library(sf)
+library(dplyr)
+```
+
+```{r}
+
+myLink='https://github.com/DemetriosThornton/HW1_repo/raw/refs/heads/main/countriesCIA_updated_DT.gpkg'
+
+mainLink='https://github.com/DACSS-CSSmeths/Spatial-Exploring/raw/refs/heads/main/maps/countriesCIA.gpkg'
+
+mapLink=paste0(mainLink, 'maps/countriesCIA.gpkg')
+
+countriesCIA=read_sf(myLink, layer = 'cia')
+
+worldBorders=read_sf(mainLink, layer = 'border')
+
+library(ggplot2)
+
+best_countries <- countriesCIA %>% filter(best_countries == 1)
+
+maskToClip <- as.vector(st_bbox(best_countries))
+
+base <- ggplot(data = worldBorders) +
+  geom_sf(fill = 'grey', color = NA) + 
+  theme_linedraw()
+
+
+plot <- base +
+  geom_sf(data = best_countries, fill = 'green', color = 'black') + 
+  coord_sf(xlim = c(maskToClip[1], maskToClip[3]), 
+           ylim = c(maskToClip[2], maskToClip[4])) +
+  geom_sf_text(data = best_countries, 
+               aes(label = COUNTRY),
+               color = 'black',
+               check_overlap = TRUE,
+               size = 4,
+               nudge_y = 0.25) +
+  ggtitle("Best Performing Countries in Obesity, Alcohol, and Tobacco Use")
+
+
+print(plot)
+
+```
